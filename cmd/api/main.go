@@ -4,6 +4,7 @@ import (
 	"apollo-counter/internal/controllers"
 	"apollo-counter/internal/database"
 	"apollo-counter/internal/handlers"
+	"apollo-counter/internal/repository"
 	"apollo-counter/internal/server"
 	"fmt"
 	"log"
@@ -33,7 +34,8 @@ func run() error {
 	}
 
 	db := database.InitDB()
-	uc := controllers.NewUserController(db)
+	ur := repository.NewUserRepository(db)
+	uc := controllers.NewUserController(ur)
 	uh := handlers.NewUserHandler(uc)
 
 	server.AddRoutes(srv, uh)

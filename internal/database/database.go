@@ -38,7 +38,6 @@ func InitDB() *sql.DB {
 	} else {
 		log.Printf("connected to db %s", dbname)
 	}
-	defer db.Close()
 
 	return db
 }

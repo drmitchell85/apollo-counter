@@ -15,6 +15,7 @@ func AddRoutes(server *Server, uh *handlers.UserHandler) {
 	})
 
 	r.Route("/users", func(r chi.Router) {
+		r.Get("/email/{email}", uh.GetUserByEmail)
 		r.Post("/newUser", uh.NewUser)
 	})
 
