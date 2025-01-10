@@ -2,10 +2,15 @@ package utils
 
 import "errors"
 
-// user error messages
 var (
+	// general error messages
 	ErrMissingFields     = errors.New("missing fields")
-	ErrUserNotFound      = errors.New("user not found")
-	ErrDuplicateEmail    = errors.New("email already exists")
 	ErrInvalidJsonFormat = errors.New("invalid JSON format")
+
+	// user error messages
+	ErrUserNotFound   = errors.New("user not found")
+	ErrDuplicateEmail = errors.New("email already exists")
+
+	// event error messages
+	ErrDuplicateTitle = errors.New("title already exists")
 )

@@ -1,5 +1,8 @@
 package models
 
+import "time"
+
+// basic models
 type User struct {
 	ID          int    `json:"id"`
 	Username    string `json:"username"`
@@ -13,6 +16,16 @@ type User struct {
 	Active      bool   `json:"is_active"`
 }
 
+type Event struct {
+	ID          string    // unique identifier
+	Title       string    // name/title of the event
+	Description string    // brief description
+	DateTime    time.Time // when the event occurs
+	CreatedAt   time.Time // metadata for tracking
+	UpdatedAt   time.Time // metadata for tracking
+}
+
+// requests
 type NewUserRequest struct {
 	Username    string `json:"username"`
 	Firstname   string `json:"firstname"`
@@ -22,6 +35,13 @@ type NewUserRequest struct {
 	Password    string `json:"password"`
 }
 
+type NewEventRequest struct {
+	Title       string // name/title of the event
+	Description string // brief description
+	DateTime    string // when the event occurs
+}
+
+// responses
 type NewUserResponse struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
