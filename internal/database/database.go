@@ -1,12 +1,14 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
 
 	// this package is needed for the PostgreSQL drivers to work
 	_ "github.com/lib/pq"
+	"github.com/redis/go-redis/v9"
 )
 
 type PostgresDB struct {
@@ -40,4 +42,32 @@ func InitDB() *sql.DB {
 	}
 
 	return db
+}
+
+func InitRedis() *redis.Client {
+	client := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "", // No password set
+		DB:       0,  // Use default DB
+		Protocol: 2,  // Connection protocol
+	})
+
+	// check connection
+	ctx := context.Background()
+
+	err := client.Set(ctx, "foo", "bar", 0).Err()
+	if err != nil {
+		log.Printf("could not insert test string into redis, with error: %s", err)
+		panic(err)
+	}
+
+	_, err = client.Get(ctx, "foo").Result()
+	if err != nil {
+		log.Printf("could not connect to redis, with error: %s", err)
+		panic(err)
+	} else {
+		log.Print("connected to redis")
+	}
+
+	return client
 }

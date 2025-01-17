@@ -36,7 +36,7 @@ func (u *UserHandler) NewUser(w http.ResponseWriter, r *http.Request) {
 
 	err := u.userController.CreateUser(req)
 	if err != nil {
-		respondFailure(w, http.StatusConflict, utils.ErrDuplicateEmail)
+		respondFailure(w, http.StatusConflict, err)
 		return
 	}
 

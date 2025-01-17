@@ -34,11 +34,18 @@ func run() error {
 	}
 
 	db := database.InitDB()
-	ur := repository.NewUserRepository(db)
-	uc := controllers.NewUserController(ur)
-	uh := handlers.NewUserHandler(uc)
+	rdb := database.InitRedis()
 
-	server.AddRoutes(srv, uh)
+	ur := repository.NewUserRepository(db)
+	er := repository.NewEventRepository(db, rdb)
+
+	uc := controllers.NewUserController(ur)
+	ec := controllers.NewEventController(er)
+
+	uh := handlers.NewUserHandler(uc)
+	eh := handlers.NewEventHandler(ec)
+
+	server.AddRoutes(srv, uh, eh)
 
 	log.Printf("listening on %s\n", httpServer.Addr)
 	if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
