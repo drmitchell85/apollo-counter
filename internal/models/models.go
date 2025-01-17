@@ -41,6 +41,10 @@ type NewEventRequest struct {
 	DateTime    string // when the event occurs
 }
 
+type DeleteEventRequest struct {
+	Title string // name/title of the event
+}
+
 // responses
 type NewUserResponse struct {
 	Username string `json:"username"`

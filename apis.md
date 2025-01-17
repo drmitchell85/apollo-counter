@@ -12,10 +12,18 @@ POST /users/newUser
     - create a new user
 
 ### /events
+GET /events/getAll
+    - gets all events from cache
+    - if cache is empty, get from db and repopulate cache
+
 POST /events/newEvent
     - create a new event
     - add to PostgreSQL
     - cache in Redis
+
+DELETE /events/deleteEvent
+    - delete an event by title
+    - repopulate cache
 
 ## Future APIs
 ### For Redis Cachine Practice

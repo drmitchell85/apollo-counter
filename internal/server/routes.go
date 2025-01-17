@@ -21,10 +21,10 @@ func AddRoutes(server *Server, uh *handlers.UserHandler, eh *handlers.EventHandl
 
 	// TODO add events route
 	r.Route("/events", func(r chi.Router) {
-		// r.Get("/", eh.GetEvents)
+		r.Get("/getAll", eh.GetAllEvents)
 		// r.Get("/id/{id}", eh.GetEventByID)
 		// r.Get("/popular", eh.GetPopularEvents)
 		r.Post("/newEvent", eh.NewEvent)
+		r.Delete("/deleteEvent", eh.DeleteEvent)
 	})
-
 }

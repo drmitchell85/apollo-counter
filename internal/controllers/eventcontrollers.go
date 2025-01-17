@@ -3,11 +3,14 @@ package controllers
 import (
 	"apollo-counter/internal/models"
 	"apollo-counter/internal/repository"
+	"encoding/json"
 	"time"
 )
 
 type EventController interface {
+	GetAllEvents() ([]models.Event, error)
 	CreateEvent(models.NewEventRequest) error
+	DeleteEvent(models.DeleteEventRequest) error
 }
 
 type eventController struct {
@@ -18,6 +21,33 @@ func NewEventController(repo repository.EventRepository) EventController {
 	return &eventController{
 		eventRepo: repo,
 	}
+}
+
+func (c *eventController) GetAllEvents() ([]models.Event, error) {
+
+	// return all events from cache
+	events, err := c.eventRepo.GetAllCachedEvents()
+	if err == nil {
+		return events, nil
+	}
+
+	// retrieve all events from ps db
+	events, err = c.eventRepo.GetAllEvents()
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := json.Marshal(events)
+	if err != nil {
+		return nil, err
+	}
+
+	// cache events to Redis
+	key := "eventsbulk"
+	ttl := time.Hour * 24
+	c.eventRepo.BulkEventCache(data, key, ttl)
+
+	return events, nil
 }
 
 func (c *eventController) CreateEvent(req models.NewEventRequest) error {
@@ -40,12 +70,48 @@ func (c *eventController) CreateEvent(req models.NewEventRequest) error {
 	}
 
 	// retrieve all events from ps db
-	err = c.eventRepo.GetAllEvents()
+	events, err := c.eventRepo.GetAllEvents()
 	if err != nil {
 		return err
 	}
 
-	// add all events to Redis
+	data, err := json.Marshal(events)
+	if err != nil {
+		return err
+	}
+
+	// cache events to Redis
+	key := "eventsbulk"
+	ttl := time.Hour * 24
+	c.eventRepo.BulkEventCache(data, key, ttl)
+
+	return nil
+}
+
+func (c *eventController) DeleteEvent(req models.DeleteEventRequest) error {
+
+	// delete event from postgresql
+	err := c.eventRepo.DeleteEvent(req.Title)
+	if err != nil {
+		return err
+	}
+
+	// update redis cache
+	// retrieve all events from ps db
+	events, err := c.eventRepo.GetAllEvents()
+	if err != nil {
+		return err
+	}
+
+	data, err := json.Marshal(events)
+	if err != nil {
+		return err
+	}
+
+	// cache events to Redis
+	key := "eventsbulk"
+	ttl := time.Hour * 24
+	c.eventRepo.BulkEventCache(data, key, ttl)
 
 	return nil
 }
