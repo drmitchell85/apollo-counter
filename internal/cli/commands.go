@@ -73,7 +73,12 @@ var healthCmd = &cobra.Command{
 	Use:     "health",
 	Aliases: []string{"healthcheck", "status"},
 	Short:   "Check the health status of the API service",
-	Run: func(cmd *cobra.Command, args []string) {
-
+	RunE: func(cmd *cobra.Command, args []string) error {
+		response, err := apiHealth()
+		if err != nil {
+			return fmt.Errorf("API service health check failed: %w", err) // Using %w for error wrapping
+		}
+		cmd.Printf("API service response: %s\n", response) // Using cmd.Printf instead of fmt.Printf
+		return nil
 	},
 }

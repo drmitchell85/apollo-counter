@@ -2,8 +2,10 @@ package cli
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 // reverse a given string
@@ -35,13 +37,26 @@ func inspectNumbers(input string) (count int) {
 	return count
 }
 
-func apiHealth() error {
+func apiHealth() ([]byte, error) {
 
-	resp, err := http.Get("localhost:8080/health")
+	client := &http.Client{
+		Timeout: 5 * time.Second,
+	}
+
+	resp, err := client.Get("http://localhost:8080/health")
 	if err != nil {
-		return fmt.Errorf("could not retrieve server health with error %s", err)
+		return nil, fmt.Errorf("connection failed: %w", err)
 	}
 	defer resp.Body.Close()
 
-	return nil
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response: %w", err)
+	}
+
+	return b, nil
 }
